@@ -15,8 +15,8 @@ RATE_LIMIT_WINDOW = "60"  # 1 minute window
 # KV namespace for rate limiting and caching
 [[kv_namespaces]]
 binding = "RATE_LIMIT_KV"
-id = "ba383042bdf947ada2c551898fcbb3f8"
-preview_id = "ba383042bdf947ada2c551898fcbb3f8"
+id = "d9f79c1337db43a5a2f0e37f1d462b00"
+preview_id = "d9f79c1337db43a5a2f0e37f1d462b00"
 
 # Production environment
 [env.production]
@@ -25,3 +25,4 @@ name = "secure-redirect-landing-prod"
 # Development environment
 [env.development]
 name = "secure-redirect-landing-dev" 
+
