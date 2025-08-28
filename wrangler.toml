@@ -1,4 +1,4 @@
-name = "secure-redirect-landing-prod"
+name = "secure-redirect-landing"
 main = "src/worker.js"
 compatibility_date = "2024-01-01"
 
@@ -25,5 +25,3 @@ name = "secure-redirect-landing-prod"
 # Development environment
 [env.development]
 name = "secure-redirect-landing-dev" 
-
-
